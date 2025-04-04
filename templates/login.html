@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="text-center mb-4">
+            <h2>Surveillance de la Qualité de l'Air</h2>
+            <p class="text-muted">Choisissez votre mode de connexion</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Admin Login Card -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-shield fa-3x mb-3 text-primary"></i>
+                        <h4 class="card-title">Administrateur</h4>
+                        <p class="card-text">Accès complet au système</p>
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#adminLoginModal">
+                            Se connecter
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest Login Card -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user fa-3x mb-3 text-secondary"></i>
+                        <h4 class="card-title">Invité</h4>
+                        <p class="card-text">Accès en lecture seule</p>
+                        <form action="{{ url_for('guest_login') }}" method="POST">
+                            <button type="submit" class="btn btn-secondary w-100">
+                                Continuer comme invité
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="modal fade" id="adminLoginModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Connexion Administrateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('admin_login') }}">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nom d'utilisateur</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<!-- Custom styles -->
+<style>
+.card {
+    transition: transform 0.2s;
+    border: none;
+    border-radius: 15px;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.modal-content {
+    border-radius: 15px;
+}
+.btn {
+    border-radius: 25px;
+    padding: 10px 20px;
+}
+.fas {
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}

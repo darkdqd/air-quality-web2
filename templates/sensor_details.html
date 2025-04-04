@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Sensor Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>
+                <i class="fas fa-microchip text-primary"></i>
+                Capteur {{ sensor.id }}
+                {% if sensor.actif %}
+                <span class="badge bg-success">Actif</span>
+                {% else %}
+                <span class="badge bg-danger">Inactif</span>
+                {% endif %}
+            </h2>
+            <p class="text-muted">
+                <i class="fas fa-map-marker-alt"></i> {{ sensor.prefecture }}
+                &nbsp;|&nbsp;
+                <i class="fas fa-flask"></i> {{ sensor.gaz }}
+            </p>
+        </div>
+        {% if session.get('is_admin') %}
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editSensorModal">
+                <i class="fas fa-edit"></i> Modifier
+            </button>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteSensorModal">
+                <i class="fas fa-trash"></i> Supprimer
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sensor Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Dernière Mesure</h6>
+                    <h3 class="mb-0">{{ sensor.last_reading }} ppm</h3>
+                    <small>{{ sensor.last_reading_date }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Moyenne Mensuelle</h6>
+                    <h3 class="mb-0">{{ sensor.monthly_average }} ppm</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Total Relevés</h6>
+                    <h3 class="mb-0">{{ sensor.total_readings }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Alertes</h6>
+                    <h3 class="mb-0">{{ sensor.alerts }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphs -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Historique des Mesures</h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="readingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Distribution des Valeurs</h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Readings Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Derniers Relevés</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Concentration (ppm)</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reading in readings %}
+                        <tr>
+                            <td>{{ reading.date }}</td>
+                            <td>{{ reading.value }} ppm</td>
+                            <td>
+                                {% if reading.is_alert %}
+                                <span class="badge bg-danger">Alerte</span>
+                                {% else %}
+                                <span class="badge bg-success">Normal</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#readingDetailsModal-{{ reading.id }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js and Leaflet -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha384-VzLXTJGPSyTLX6d96AxgkKvE/LRb7ECGyTxuwtpjHnVWVZs2gp5RDjeM/tgBnVdM" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha384-RFZC58YeKApoNsIbBxf4z6JJXmh+geBSgkCQXFyh+4tiFSJmJBt+2FbjxW7Ar16M" crossorigin="anonymous"></script>
+
+<!-- Application JavaScript -->
+<script>
+// Parse data from Jinja templates
+const sensorData = JSON.parse(`{{ {
+    "readings": {
+        "labels": readings_data.labels,
+        "values": readings_data.values
+    },
+    "alerts": {
+        "labels": alerts.labels,
+        "data": alerts.data
+    },
+    "location": {
+        "lat": sensor.lat,
+        "lng": sensor.lng,
+        "name": sensor.name,
+        "status": sensor.status
+    }
+} | tojson }}`);
+
+// Initialize charts and map
+(function() {
+    function initializeCharts() {
+        // Readings Chart
+        const readingsCtx = document.getElementById('readingsChart').getContext('2d');
+        new Chart(readingsCtx, {
+            type: 'line',
+            data: {
+                labels: sensorData.readings.labels,
+                datasets: [{
+                    label: 'Concentration (ppm)',
+                    data: sensorData.readings.values,
+                    borderColor: '#36A2EB',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Concentration (ppm)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Alerts Chart
+        const alertsCtx = document.getElementById('alertsChart').getContext('2d');
+        new Chart(alertsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: sensorData.alerts.labels,
+                datasets: [{
+                    data: sensorData.alerts.data,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeMap() {
+        const map = L.map('sensorMap').setView([sensorData.location.lat, sensorData.location.lng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ' OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        L.marker([sensorData.location.lat, sensorData.location.lng])
+            .bindPopup('<strong>' + sensorData.location.name + '</strong><br>Status: ' + sensorData.location.status)
+            .addTo(map);
+    }
+
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        initializeMap();
+    });
+})();
+</script>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.chart-container {
+    margin: 20px 0;
+    min-height: 300px;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+#sensorMap {
+    height: 400px;
+    border-radius: 15px;
+}
+</style>
+{% endblock %}

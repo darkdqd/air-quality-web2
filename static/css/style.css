@@ -1,0 +1,141 @@
+/* Style général */
+:root {
+    --primary-color: #36A2EB;
+    --secondary-color: #FF6384;
+    --success-color: #4BC0C0;
+    --warning-color: #FFCE56;
+    --danger-color: #FF6384;
+    --background-color: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: var(--background-color);
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--primary-color) !important;
+}
+
+/* Cartes */
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 15px 15px 0 0 !important;
+}
+
+/* Graphiques */
+.chart-container {
+    position: relative;
+    margin: 20px 0;
+    min-height: 300px;
+}
+
+/* Carte */
+#sensorMap {
+    height: 400px;
+    border-radius: 15px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Tableaux */
+.table {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table th {
+    border-top: none;
+    background-color: var(--background-color);
+}
+
+/* Statuts */
+.status-badge {
+    padding: 0.5em 1em;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.status-online {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.status-offline {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.status-warning {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+/* Formulaires */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(54, 162, 235, 0.25);
+}
+
+.btn {
+    border-radius: 10px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #2b8fd9;
+    border-color: #2b8fd9;
+}
+
+/* Alertes */
+.alert {
+    border-radius: 15px;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .chart-container {
+        min-height: 200px;
+    }
+    
+    #sensorMap {
+        height: 300px;
+    }
+}
