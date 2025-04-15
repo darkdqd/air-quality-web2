@@ -2,4 +2,8 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python -m flask run --host=0.0.0.0 --port=$PORT"
+startCommand = "gunicorn test:app --bind=0.0.0.0:$PORT"
+
+[deploy.envs]
+FLASK_APP = "test.py"
+FLASK_ENV = "production"
