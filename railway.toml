@@ -3,12 +3,13 @@ builder = "NIXPACKS"
 buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 4"
-healthcheckPath = "/health"
-healthcheckTimeout = 100
+startCommand = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --timeout 60"
+healthcheckPath = "/"
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
-restartPolicyMaxRetries = 5
+restartPolicyMaxRetries = 10
 
 [deploy.envs]
 FLASK_ENV = "production"
 PYTHONUNBUFFERED = "1"
+WEB_CONCURRENCY = "1"
