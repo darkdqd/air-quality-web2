@@ -1,23 +1,50 @@
 # Système de Surveillance de la Qualité de l'Air
 
-<<<<<<< HEAD
-Application web pour la centralisation des données sur la qualité de l'air en France, utilisant Railway.app pour une base de données MySQL accessible mondialement.
+Application web pour la centralisation des données sur la qualité de l'air en France en temps réel.
 
-## Déploiement Rapide
+## Accès à l'Application
 
-1. Base de données (Railway):
-   - Créez un compte sur [Railway.app](https://railway.app)
-   - Créez un nouveau projet
-   - Choisissez "Provision MySQL"
-   - Copiez les informations de connexion
+L'application est accessible à l'adresse suivante :
+[https://air-quality-web2.up.railway.app](https://air-quality-web2.up.railway.app)
 
-2. Configuration locale:
+### Points d'Accès
+- `/` : Tableau de bord principal
+- `/health` : État du système
+
+## Déploiement
+
+### Base de données
+L'application utilise une base de données MySQL hébergée sur Railway.app.
+
+### Variables d'Environnement
+```env
+DATABASE_URL=mysql://user:pass@host:3306/railway
+SECRET_KEY=your-secret-key
+FLASK_ENV=production
+```
+
+### Déploiement sur Railway
+1. Connectez votre repo GitHub à Railway
+2. Railway détectera automatiquement l'application Python
+3. Les variables d'environnement seront configurées automatiquement
+
+### Développement Local
+1. Clonez le repository :
    ```bash
-   # Clonez le repository
-   git clone <votre-repo>
-   cd air-quality-web
+   git clone https://github.com/darkdqd/air-quality-web2.git
+   cd air-quality-web2
+   ```
 
-   # Créez le fichier .env
+2. Configurez l'environnement :
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # Linux/Mac
+   .venv\Scripts\activate    # Windows
+   pip install -r requirements.txt
+   ```
+
+3. Configurez les variables d'environnement :
+   ```bash
    cp .env.example .env
    # Complétez avec vos informations Railway
    ```
