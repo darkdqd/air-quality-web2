@@ -11,6 +11,40 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
+# Database connection
+def get_db_connection():
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        from urllib.parse import urlparse
+        url = urlparse(database_url)
+        return mysql.connector.connect(
+            host=url.hostname,
+            user=url.username,
+            password=url.password,
+            database=url.path[1:],
+            port=url.port or 3306
+        )
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME'),
+        port=int(os.getenv('DB_PORT', 3306))
+    )
+
+# Routes
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
+
+@app.route('/health')
+def health():
+    return jsonify({'status': 'healthy'})
+
+if __name__ == '__main__':
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+
 # User roles and credentials
 USERS = {
     'admin': {'password': 'admin123', 'role': 'admin'},
