@@ -95,7 +95,8 @@ def health():
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.config['SERVER_NAME'] = os.getenv('SERVER_NAME', 'air-quality-web2.up.railway.app')
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 # User roles and credentials
 USERS = {
