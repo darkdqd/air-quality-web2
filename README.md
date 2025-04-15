@@ -1,5 +1,6 @@
 # Système de Surveillance de la Qualité de l'Air
 
+<<<<<<< HEAD
 Application web pour la centralisation des données sur la qualité de l'air en France, utilisant Railway.app pour une base de données MySQL accessible mondialement.
 
 ## Déploiement Rapide
@@ -21,12 +22,20 @@ Application web pour la centralisation des données sur la qualité de l'air en 
    # Complétez avec vos informations Railway
    ```
 
-3. Déploiement de l'application:
-   - Connectez votre repo GitHub à Railway
-   - Railway déploiera automatiquement
-   - L'application sera accessible via une URL Railway
+3. Démarrez l'application:
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/Mac
+pip install -r requirements.txt
+flask run
+```
 
-Application web pour la centralisation des données sur la qualité de l'air en France, mandatée par le ministère de la Transition Écologique.
+## Fonctionnalités
+- Affichage en temps réel des données de qualité de l'air
+- Carte interactive des stations
+- Historique et tendances
+- Alertes de pollution
 
 ## Structure du Projet
 
