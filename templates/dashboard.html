@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {{ super() }}
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">Tableau de Bord - Qualité de l'Air</h2>
+            <p class="text-muted">Vue d'ensemble des mesures de qualité de l'air en France</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Capteurs Actifs</h5>
+                    <h2 class="mb-0">{{ stats.active_sensors }}</h2>
+                    <small>sur {{ stats.total_sensors }} capteurs</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Régions Couvertes</h5>
+                    <h2 class="mb-0">{{ stats.regions }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Relevés ce Mois</h5>
+                    <h2 class="mb-0">{{ stats.monthly_readings }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Rapports Générés</h5>
+                    <h2 class="mb-0">{{ stats.reports }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Charts -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Évolution des Concentrations</h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="concentrationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Répartition par Gaz</h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="gasDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regional Data -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Carte des Capteurs</h5>
+                    <div id="sensorMap" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Alertes par Région</h5>
+                    <div class="chart-container" style="position: relative; height:400px;">
+                        <canvas id="alertChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if session.get('is_admin') %}
+    <!-- Admin Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Administration</h5>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Gestion des Capteurs</h6>
+                                    <a href="{{ url_for('admin_sensors') }}" class="btn btn-primary btn-sm">Gérer</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Gestion des Utilisateurs</h6>
+                                    <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-sm">Gérer</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6>Rapports Système</h6>
+                                    <a href="{{ url_for('admin_reports') }}" class="btn btn-primary btn-sm">Voir</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Include Chart.js and Leaflet -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha384-VzLXTJGPSyTLX6d96AxgkKvE/LRb7ECGyTxuwtpjHnVWVZs2gp5RDjeM/tgBnVdM" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha384-RFZC58YeKApoNsIbBxf4z6JJXmh+geBSgkCQXFyh+4tiFSJmJBt+2FbjxW7Ar16M" crossorigin="anonymous"></script>
+
+<!-- Application JavaScript -->
+<script>
+// Parse data from Jinja templates
+const appData = JSON.parse(`{{ {
+    "concentration": {
+        "labels": concentration_data.labels,
+        "values": concentration_data.values
+    },
+    "gasDistribution": {
+        "labels": gas_distribution.labels,
+        "data": gas_distribution.data
+    },
+    "alerts": {
+        "labels": alert_data.labels,
+        "data": alert_data.data
+    },
+    "sensors": sensor_data
+} | tojson }}`);
+
+// Initialize charts and map
+(function() {
+    function initializeCharts() {
+        // Concentration Chart
+        const concentrationCtx = document.getElementById('concentrationChart').getContext('2d');
+        new Chart(concentrationCtx, {
+            type: 'line',
+            data: {
+                labels: appData.concentration.labels,
+                datasets: [{
+                    label: 'Concentration (ppm)',
+                    data: appData.concentration.values,
+                    borderColor: '#36A2EB',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Concentration (ppm)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gas Distribution Chart
+        const gasDistributionCtx = document.getElementById('gasDistributionChart').getContext('2d');
+        new Chart(gasDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: appData.gasDistribution.labels,
+                datasets: [{
+                    data: appData.gasDistribution.data,
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Alert Chart
+        const alertCtx = document.getElementById('alertChart').getContext('2d');
+        new Chart(alertCtx, {
+            type: 'bar',
+            data: {
+                labels: appData.alerts.labels,
+                datasets: [{
+                    label: 'Alertes',
+                    data: appData.alerts.data,
+                    backgroundColor: '#FF9F40'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Nombre d'alertes"
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeMap() {
+        const map = L.map('sensorMap').setView([46.85, 2.35], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ' OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        appData.sensors.forEach(function(sensor) {
+            const popupContent = [
+                '<strong>' + sensor.name + '</strong>',
+                'Status: ' + sensor.status,
+                'Type: ' + sensor.type,
+                'Dernière mesure: ' + sensor.last_reading + ' ppm'
+            ].join('<br>');
+            
+            L.marker([sensor.lat, sensor.lng])
+                .bindPopup(popupContent)
+                .addTo(map);
+        });
+    }
+
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        initializeMap();
+    });
+})();
+</script>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.chart-container {
+    margin: 20px 0;
+    min-height: 300px;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+#sensorMap {
+    height: 400px;
+    border-radius: 15px;
+}
+</style>
+{% endblock %}
