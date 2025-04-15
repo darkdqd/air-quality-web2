@@ -1,102 +1,47 @@
-from flask import Flask, render_template, request, jsonify, flash, redirect, url_for, session
-import mysql.connector
-import pandas as pd
-from datetime import datetime
+from flask import Flask, render_template, jsonify
 import os
-import sys
 import logging
 from dotenv import load_dotenv
-from functools import wraps
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+# Basic logging configuration
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load environment variables
 load_dotenv()
 
+# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key')
 
 logger.info('Starting application...')
-logger.info(f'Environment: {os.getenv("FLASK_ENV", "development")}')
 
-# Database connection
-def get_db_connection():
+# Database connection will be added later
+def get_db_status():
     try:
-        database_url = os.getenv('DATABASE_URL')
-        logger.info('Attempting database connection...')
-        
-        if database_url:
-            logger.info('Using DATABASE_URL for connection')
-            from urllib.parse import urlparse
-            url = urlparse(database_url)
-            conn = mysql.connector.connect(
-                host=url.hostname,
-                user=url.username,
-                password=url.password,
-                database=url.path[1:],
-                port=url.port or 3306
-            )
-        else:
-            logger.info('Using individual environment variables for connection')
-            conn = mysql.connector.connect(
-                host=os.getenv('DB_HOST'),
-                user=os.getenv('DB_USER'),
-                password=os.getenv('DB_PASSWORD'),
-                database=os.getenv('DB_NAME'),
-                port=int(os.getenv('DB_PORT', 3306))
-            )
-        
-        logger.info('Database connection successful')
-        return conn
+        return {'status': 'configured'}
     except Exception as e:
-        logger.error(f'Database connection failed: {str(e)}')
-        raise
+        logger.error(f'Database error: {str(e)}')
+        return {'status': 'error', 'message': str(e)}
 
 # Routes
 @app.route('/')
 def index():
-    try:
-        logger.info('Accessing dashboard route')
-        # Test database connection
-        conn = get_db_connection()
-        conn.close()
-        logger.info('Database connection test successful')
-        return render_template('dashboard.html')
-    except Exception as e:
-        logger.error(f'Error in dashboard route: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+    logger.info('Accessing dashboard route')
+    return render_template('dashboard.html')
 
 @app.route('/health')
 def health():
-    try:
-        logger.info('Checking application health')
-        # Test database connection
-        conn = get_db_connection()
-        conn.close()
-        logger.info('Health check successful')
-        return jsonify({
-            'status': 'healthy',
-            'database': 'connected',
-            'environment': os.getenv('FLASK_ENV', 'development')
-        })
-    except Exception as e:
-        logger.error(f'Health check failed: {str(e)}')
-        return jsonify({
-            'status': 'unhealthy',
-            'error': str(e)
-        }), 500
+    logger.info('Health check endpoint accessed')
+    return jsonify({
+        'status': 'healthy',
+        'version': '1.0.0',
+        'database': get_db_status()
+    })
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
-    app.config['SERVER_NAME'] = os.getenv('SERVER_NAME', 'air-quality-web2.up.railway.app')
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port)
 
 # User roles and credentials
 USERS = {
