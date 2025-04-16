@@ -12,13 +12,28 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 bootstrap = Bootstrap5(app)
 
 # Configure Flask-Assets
 assets = Environment(app)
 assets.url = app.static_url_path
-css = Bundle('css/style.css', output='gen/packed.css')
+assets.debug = True
+
+# Register asset bundles
+css = Bundle(
+    'css/style.css',
+    output='gen/packed.css'
+)
 assets.register('css_all', css)
+
+js = Bundle(
+    'js/main.js',
+    'js/map.js',
+    output='gen/packed.js'
+)
+assets.register('js_all', js)
 
 @app.route('/')
 def index():
