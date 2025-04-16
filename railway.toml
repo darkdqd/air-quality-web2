@@ -5,3 +5,6 @@ buildCommand = "docker build -t app ."
 [deploy]
 healthcheckPath = "/"
 healthcheckTimeout = 30
+
+[deploy.envs]
+PORT = "8000"
