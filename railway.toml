@@ -2,12 +2,11 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "gunicorn test:app --bind=0.0.0.0:$PORT --workers=2 --threads=2 --worker-class=gthread --timeout=30 --log-level=debug"
+startCommand = "python test.py"
 healthcheckPath = "/"
 healthcheckTimeout = 30
 
 [deploy.envs]
 FLASK_APP = "test.py"
-FLASK_ENV = "production"
+FLASK_DEBUG = "1"
 PYTHONUNBUFFERED = "1"
-WEB_CONCURRENCY = "2"
