@@ -2,12 +2,11 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "gunicorn wsgi:app --bind=0.0.0.0:$PORT --workers=4"
-healthcheckPath = "/health"
+startCommand = "gunicorn test:app"
+healthcheckPath = "/"
 healthcheckTimeout = 30
 
 [deploy.envs]
-FLASK_APP = "wsgi.py"
+FLASK_APP = "test.py"
 FLASK_ENV = "production"
 PYTHONUNBUFFERED = "1"
-SECRET_KEY = "your-secret-key-change-in-production"
