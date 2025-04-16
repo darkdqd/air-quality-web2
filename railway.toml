@@ -2,12 +2,11 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python test.py"
+startCommand = "gunicorn test:app --log-level debug"
 healthcheckPath = "/"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 
 [deploy.envs]
 FLASK_APP = "test.py"
 FLASK_ENV = "production"
 PYTHONUNBUFFERED = "1"
-PORT = "5000"
