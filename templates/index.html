@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4 mb-4">Surveillance de la Qualité de l'Air</h1>
+                <p class="lead mb-4">
+                    Bienvenue sur notre plateforme de surveillance de la qualité de l'air. 
+                    Nous fournissons des données en temps réel sur la qualité de l'air dans votre région.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="container py-4">
+    <div class="row">
+        <!-- Qualité Globale -->
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Qualité Globale</h5>
+                    <div class="quality-indicator quality-good"></div>
+                    <span class="stat-value">Bonne</span>
+                    <p class="card-text text-muted">Indice: 45/100</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stations Actives -->
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Stations Actives</h5>
+                    <div class="stat-value text-success">12</div>
+                    <p class="card-text text-muted">Sur 15 stations totales</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dernière Mise à Jour -->
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Dernière Mise à Jour</h5>
+                    <div class="stat-value text-primary">{{ current_time }}</div>
+                    <p class="card-text text-muted">Mise à jour en temps réel</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+<div class="container py-4">
+    <div class="card chart-container">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Évolution sur 24h</h5>
+            <div id="airQualityChart" style="height: 300px;">
+                <!-- Le graphique sera chargé ici par JavaScript -->
+                <div class="text-center text-muted">
+                    <em>Les données historiques seront disponibles prochainement</em>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
