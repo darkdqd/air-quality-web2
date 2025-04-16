@@ -2,11 +2,9 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "flask run --host=0.0.0.0 --port=$PORT"
+startCommand = "gunicorn test:app"
 healthcheckPath = "/"
 healthcheckTimeout = 30
 
 [deploy.envs]
-FLASK_APP = "test.py"
-FLASK_ENV = "development"
 PYTHONUNBUFFERED = "1"
