@@ -1,5 +1,6 @@
 [build]
 builder = "NIXPACKS"
+plan = "nixpacks.toml"
 
 [deploy]
 startCommand = "python test.py"
@@ -7,6 +8,5 @@ healthcheckPath = "/"
 healthcheckTimeout = 30
 
 [deploy.envs]
-FLASK_APP = "test.py"
 FLASK_DEBUG = "1"
 PYTHONUNBUFFERED = "1"
