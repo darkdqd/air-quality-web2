@@ -5,9 +5,6 @@ Application web pour la centralisation des données sur la qualité de l'air en 
 ## Accès à l'Application
 
 L'application est accessible à l'adresse suivante :
-[https://projet-bdd-production.up.railway.app](https://projet-bdd-production.up.railway.app)
-
-Ou alternativement :
 [https://projet-bdd.railway.app](https://projet-bdd.railway.app)
 
 ### Points d'Accès
