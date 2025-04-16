@@ -1,12 +1,10 @@
 [build]
 builder = "DOCKERFILE"
-buildCommand = "docker build -t app ."
 
 [deploy]
 healthcheckPath = "/"
-healthcheckTimeout = 60
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 5
+healthcheckTimeout = 10
 
 [deploy.envs]
 PORT = "8000"
+FLASK_ENV = "production"
