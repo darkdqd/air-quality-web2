@@ -1,55 +1,23 @@
-<!DOCTYPE html>
+{{ ... }}
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Air Quality Web{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    {{ assets.css() }}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="{{ url_for('main.index') }}" class="brand">Air Quality Web</a>
-        <div class="nav-links">
-            <a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Accueil</a>
-            <a href="{{ url_for('main.map') }}" class="nav-link {% if request.endpoint == 'main.map' %}active{% endif %}">Carte</a>
-            <a href="{{ url_for('main.stats') }}" class="nav-link {% if request.endpoint == 'main.stats' %}active{% endif %}">Statistiques</a>
-        </div>
-        <div class="auth-buttons">
-            {% if current_user.is_authenticated %}
-                {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-login">Admin</a>
-                {% endif %}
-                <form action="{{ url_for('auth.logout') }}" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-logout">Déconnexion</button>
-                </form>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn btn-login">Connexion</a>
-            {% endif %}
+    <nav>
+        <div>
+            <a href="/">Air Quality Web</a>
         </div>
     </nav>
 
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} fade-in">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; {{ now.year }} Air Quality Web. Données fournies par data.gouv.fr</p>
-        </div>
+    <footer>
+        <p>&copy; 2024 Air Quality Web</p>
     </footer>
-
-    {{ assets.js() }}
 </body>
 </html>

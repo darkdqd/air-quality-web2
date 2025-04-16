@@ -3,51 +3,18 @@
 {% block title %}Accueil - Air Quality Web{% endblock %}
 
 {% block content %}
-<div class="dashboard fade-in">
-    <section class="stats-grid">
-        <div class="stat-card">
-            <h3>Stations Actives</h3>
-            <div class="value">{{ stats.active_stations }}</div>
-        </div>
-        <div class="stat-card">
-            <h3>Mesures Aujourd'hui</h3>
-            <div class="value">{{ stats.today_measurements }}</div>
-        </div>
-        <div class="stat-card">
-            <h3>Qualité Moyenne</h3>
-            <div class="value">{{ stats.average_quality }}</div>
-        </div>
-        <div class="stat-card">
-            <h3>Alertes en Cours</h3>
-            <div class="value">{{ stats.active_alerts }}</div>
-        </div>
-    </section>
-
-    <section class="latest-readings">
-        <h2>Dernières Mesures</h2>
-        <div class="chart-container">
-            <canvas id="airQualityChart"></canvas>
-        </div>
-    </section>
-
-    <section class="station-map">
-        <h2>Carte des Stations</h2>
-        <div id="map" style="height: 400px;"></div>
-    </section>
+<div>
+    <h1>Air Quality Web</h1>
+    <p>Bienvenue sur l'application de surveillance de la qualité de l'air.</p>
+    
+    <div>
+        <h2>Statistiques</h2>
+        <ul>
+            <li>Stations actives: {{ stats.active_stations }}</li>
+            <li>Mesures aujourd'hui: {{ stats.today_measurements }}</li>
+            <li>Qualité moyenne: {{ stats.average_quality }}</li>
+            <li>Alertes actives: {{ stats.active_alerts }}</li>
+        </ul>
+    </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-
-<script>
-    // Données pour le graphique
-    const chartData = {{ chart_data|tojson }};
-    initAirQualityChart(chartData);
-
-    // Données pour la carte
-    const stations = {{ stations|tojson }};
-    initMap(stations);
-</script>
 {% endblock %}
