@@ -1,8 +1,14 @@
 [build]
 builder = "NIXPACKS"
 
+[phases.setup]
+cmds = ["python -m pip install --upgrade pip setuptools wheel"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
 [deploy]
-startCommand = "gunicorn test:app"
+startCommand = "gunicorn test:app --bind=0.0.0.0:$PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 30
 
