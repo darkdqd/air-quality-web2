@@ -8,5 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV PORT=8000
+ENV FLASK_ENV=production
 
-CMD python test.py
+CMD gunicorn test:app --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 30

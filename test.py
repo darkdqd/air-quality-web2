@@ -1,6 +1,9 @@
 import os
 import logging
-from flask import Flask, jsonify
+from datetime import datetime
+from flask import Flask, render_template, jsonify
+from flask_assets import Environment, Bundle
+from flask_bootstrap import Bootstrap5
 
 # Configure logging
 logging.basicConfig(
@@ -9,15 +12,29 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+bootstrap = Bootstrap5(app)
+
+# Configure Flask-Assets
+assets = Environment(app)
+assets.url = app.static_url_path
+css = Bundle('css/style.css', output='gen/packed.css')
+assets.register('css_all', css)
 
 @app.route('/')
 def index():
-    port = os.environ.get('PORT', '8000')
-    logging.info(f'Handling request on port {port}')
+    current_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+    logging.info('Rendering index page')
+    return render_template('index.html',
+                         title='Surveillance Qualité de l\'Air',
+                         current_time=current_time)
+
+@app.route('/health')
+def health():
+    logging.info('Health check request received')
     return jsonify({
         'status': 'ok',
-        'message': 'Air Quality Web is running',
-        'port': port
+        'timestamp': datetime.now().isoformat(),
+        'environment': os.environ.get('FLASK_ENV', 'development')
     })
 
 if __name__ == '__main__':
