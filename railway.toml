@@ -2,12 +2,13 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "gunicorn test:app --bind=0.0.0.0:$PORT --log-level debug"
+startCommand = "gunicorn wsgi:app --bind=0.0.0.0:$PORT --workers=4"
 healthcheckPath = "/"
 healthcheckTimeout = 60
 
 [deploy.envs]
-FLASK_APP = "test.py"
+FLASK_APP = "wsgi.py"
 FLASK_ENV = "production"
 PYTHONUNBUFFERED = "1"
 SERVER_NAME = "projet-bdd.railway.app"
+SECRET_KEY = "your-secret-key-change-in-production"

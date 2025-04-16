@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Administration - Air Quality Web{% endblock %}
+
+{% block content %}
+<div class="dashboard fade-in">
+    <h1>Tableau de Bord Administrateur</h1>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <h3>Utilisateurs</h3>
+            <div class="value">{{ users|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Stations</h3>
+            <div class="value">{{ stations|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Mesures Récentes</h3>
+            <div class="value">{{ recent_data|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Actions</h3>
+            <a href="{{ url_for('admin.refresh_data') }}" class="btn btn-primary">Rafraîchir les données</a>
+        </div>
+    </section>
+
+    <section class="admin-content">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Derniers Utilisateurs</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Email</th>
+                                    <th>Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users[-5:] %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_admin %}
+                                        <span class="badge bg-success">Oui</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Non</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary">Voir tous les utilisateurs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Dernières Mesures</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Station</th>
+                                    <th>Polluant</th>
+                                    <th>Valeur</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in recent_data %}
+                                <tr>
+                                    <td>{{ data.station_name }}</td>
+                                    <td>{{ data.pollutant }}</td>
+                                    <td>{{ data.value }} {{ data.unit }}</td>
+                                    <td>{{ data.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
